@@ -1,0 +1,12 @@
+* Config/settings suport
+* Database migrations
+* Logging
+* Pagination
+* Sorting
+* Filtering
+* Authentication and Authorization
+* Full text search
+* Metrics
+* Delete operations
+* Maybe simplify pydantic error messages
+* Script to import Linux fortunes

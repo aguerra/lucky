@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "lucky"
+version = "0.1.0"
+description = "A toy HTTP API for managing fortunes"
+authors = ["Alex Guerra"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {version = "^0.115.5", extras = ["standard"]}
+sqlalchemy = "^2.0.36"
+aiosqlite = "^0.20.0"
+tsidpy = "^1.1.5"
+tenacity = "^9.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pydocstyle]
+ignore = ["D100", "D101", "D102", "D103", "D105", "D106"]
+
+[tool.isort]
+multi_line_output = 3
