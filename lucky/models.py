@@ -100,6 +100,10 @@ class Base(DeclarativeBase):
         await session.refresh(self)
         return self
 
+    async def delete(self, session: AsyncSession) -> None:
+        await session.delete(self)
+        await session.commit()
+
     def flag_modified(self, attr: str) -> None:
         flag_modified(self, attr)
 

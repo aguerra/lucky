@@ -159,3 +159,12 @@ def test_datetime_from_string():
     actual = datetime_from_string('2025-02-26T23:31:55')
 
     assert expected == actual
+
+
+@pytest.mark.anyio
+async def test_delete(author, create_fortune, session, tags):
+    fortune = await create_fortune(content='Test', author=author, tags=tags)
+    expected = await fortune.delete(session)
+    actual = await session.get(Fortune, fortune.id)
+
+    assert expected == actual
