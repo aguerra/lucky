@@ -15,7 +15,7 @@ poetry = docker run -it --rm \
 	$(result_image) \
 	sh -c "poetry $(1)"
 
-.PHONY: poetry-image test run-dev
+.PHONY: poetry-image test run-dev poetry-lock poetry-install
 
 poetry-image:
 	docker build --build-arg poetry_version=$(poetry_version) --build-arg python_image=$(python_image) -t $(result_image) .
