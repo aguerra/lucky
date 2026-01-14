@@ -15,7 +15,7 @@ poetry = docker run -it --rm \
 	$(result_image) \
 	sh -c "poetry $(1)"
 
-.PHONY: poetry-image test run-dev poetry-lock poetry-install
+.PHONY: poetry-image tests run-dev poetry-lock poetry-install import-csv
 
 poetry-image:
 	docker build --build-arg poetry_version=$(poetry_version) --build-arg python_image=$(python_image) -t $(result_image) .
@@ -31,3 +31,6 @@ poetry-lock: poetry-image
 
 poetry-install: poetry-image
 	$(call poetry,install)
+
+import-csv: poetry-image
+	$(call poetry,run python -m scripts.import_data $(CSV_FILE))
