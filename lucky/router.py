@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from tenacity import retry, stop_after_attempt, wait_exponential
+from uuid import UUID
 
 from .dependencies import SessionDep
 from .models import Author, Fortune, Tag
@@ -7,7 +8,6 @@ from .schemas import (
     AuthorItems,
     AuthorOut,
     AuthorPatch,
-    EntityId,
     FortuneIn,
     FortuneItems,
     FortuneOut,
@@ -36,7 +36,7 @@ async def get_tags(session: SessionDep) -> dict[str, list[Tag]]:
     response_model=TagOut,
     response_model_exclude_none=True,
 )
-async def get_tag(tag_id: EntityId, session: SessionDep) -> Tag:
+async def get_tag(tag_id: UUID, session: SessionDep) -> Tag:
     tag = await session.get(Tag, tag_id)
     if not tag:
         raise HTTPException(status_code=404, detail="tag not found")
@@ -49,7 +49,7 @@ async def get_tag(tag_id: EntityId, session: SessionDep) -> Tag:
     response_model_exclude_none=True,
 )
 async def patch_tag(
-        tag_id: EntityId,
+        tag_id: UUID,
         patch: TagPatch,
         session: SessionDep,
 ) -> Tag:
@@ -77,7 +77,7 @@ async def get_authors(session: SessionDep) -> dict[str, list[Author]]:
     response_model=AuthorOut,
     response_model_exclude_none=True,
 )
-async def get_author(author_id: EntityId, session: SessionDep) -> Author:
+async def get_author(author_id: UUID, session: SessionDep) -> Author:
     author = await session.get(Author, author_id)
     if not author:
         raise HTTPException(status_code=404, detail="author not found")
@@ -90,7 +90,7 @@ async def get_author(author_id: EntityId, session: SessionDep) -> Author:
     response_model_exclude_none=True,
 )
 async def patch_author(
-        author_id: EntityId,
+        author_id: UUID,
         patch: AuthorPatch,
         session: SessionDep,
 ) -> Author:
@@ -117,7 +117,7 @@ async def get_fortunes(session: SessionDep) -> dict[str, list[Fortune]]:
     response_model=FortuneOut,
     response_model_exclude_none=True,
 )
-async def get_fortune(fortune_id: EntityId, session: SessionDep) -> Fortune:
+async def get_fortune(fortune_id: UUID, session: SessionDep) -> Fortune:
     fortune = await session.get(Fortune, fortune_id)
     if not fortune:
         raise HTTPException(status_code=404, detail="fortune not found")
@@ -130,7 +130,7 @@ async def get_fortune(fortune_id: EntityId, session: SessionDep) -> Fortune:
     stop=stop_after_attempt(4),
 )
 async def _patch_fortune(
-        fortune_id: EntityId,
+        fortune_id: UUID,
         patch: FortunePatch,
         session: SessionDep,
 ) -> Fortune:
@@ -159,7 +159,7 @@ async def _patch_fortune(
     response_model_exclude_none=True,
 )
 async def patch_fortune(
-        fortune_id: EntityId,
+        fortune_id: UUID,
         patch: FortunePatch,
         session: SessionDep,
 ) -> Fortune:

@@ -1,26 +1,18 @@
 from datetime import datetime
 from typing import Annotated, Self
+from uuid import UUID
 
 from pydantic import (
-    AfterValidator,
     BaseModel,
     StringConstraints,
-    field_serializer,
     model_validator
 )
-
-from .models import entity_id_from_string, entity_id_to_string
 
 AuthorName = Annotated[str, StringConstraints(min_length=1, max_length=128)]
 TagValue = Annotated[str, StringConstraints(min_length=1, max_length=32)]
 FortuneContent = Annotated[
     str,
     StringConstraints(min_length=1, max_length=512),
-]
-EntityId = Annotated[
-    str,
-    StringConstraints(min_length=13, max_length=13),
-    AfterValidator(lambda x: entity_id_from_string(x)),
 ]
 
 
@@ -52,13 +44,9 @@ class TagPatch(BaseModel):
 
 
 class EntityModelOut(BaseModel):
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime | None = None
-
-    @field_serializer('id')
-    def serialize_id(self, id: int, _info) -> str:
-        return entity_id_to_string(id)
 
 
 class AuthorOutWithoutFortunes(EntityModelOut):

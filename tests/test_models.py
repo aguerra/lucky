@@ -7,9 +7,7 @@ from lucky.models import (
     EntityExistsError,
     Fortune,
     Tag,
-    datetime_from_string,
-    entity_id_from_string,
-    entity_id_to_string
+    datetime_from_string
 )
 
 
@@ -33,16 +31,6 @@ def tags():
     return [Tag(tag='tag_1'), Tag(tag='tag_2')]
 
 
-@pytest.fixture
-def entity_id():
-    return 687074410262059062
-
-
-@pytest.fixture
-def entity_id_as_string():
-    return '0K27TH4PYWP1P'
-
-
 @pytest.mark.anyio
 async def test_save(author, session):
     expected = await author.save(session)
@@ -63,13 +51,6 @@ async def test_save_raise_entity_exists_error(
 
     with pytest.raises(EntityExistsError):
         await new_fortune.save(session)
-
-
-@pytest.mark.anyio
-async def test_save_reraise_exception(session):
-    author = Author(id=11901125208844872010, name='Anonymous')
-    with pytest.raises(OverflowError, match=r'int too large'):
-        await author.save(session)
 
 
 @pytest.mark.anyio
@@ -131,25 +112,6 @@ async def test_with_fortunes(author, create_fortune, session, tags):
     author = await author.with_fortunes(session)
     actual = author.fortunes
     expected = [fortune_1, fortune_2]
-
-    assert expected == actual
-
-
-def test_entity_id_from_string(entity_id, entity_id_as_string):
-    expected = entity_id
-    actual = entity_id_from_string(entity_id_as_string)
-
-    assert expected == actual
-
-
-def test_entity_id_from_string_raise_invalid_string():
-    with pytest.raises(ValueError, match=r'invalid string'):
-        entity_id_from_string('aaaaaaaaaaaaa')
-
-
-def test_entity_id_to_string(entity_id, entity_id_as_string):
-    expected = entity_id_as_string
-    actual = entity_id_to_string(entity_id)
 
     assert expected == actual
 

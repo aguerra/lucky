@@ -1,16 +1,16 @@
 from asyncio import sleep
 from random import choices, randrange
 from string import printable
+from uuid import UUID
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from lucky.dependencies import catch_session_exceptions, get_session
 from lucky.main import app
-from lucky.models import datetime_from_string, entity_id_from_string
+from lucky.models import datetime_from_string
 from lucky.schemas import (
     AuthorName,
-    EntityId,
     FortuneContent,
     TagValue,
     max_length,
@@ -66,7 +66,7 @@ async def create_fortune(client):
 
 @pytest.fixture
 def entity_id():
-    return '0K27TH4PYWP1P'
+    return '019a8359-f49d-7f56-8921-977e2c47242c'
 
 
 @pytest.fixture
@@ -107,9 +107,9 @@ async def test_create_fortune(client):
     response = await client.post('/api/fortunes', json=payload)
     actual = response.json()
     expected = {
-        'id': entity_id_from_string,
+        'id': UUID,
         'author': {
-            'id': entity_id_from_string,
+            'id': UUID,
             'name': payload['author'],
             'created_at': datetime_from_string
         },
@@ -117,7 +117,7 @@ async def test_create_fortune(client):
         'created_at': datetime_from_string,
         'tags': [
             {
-                'id': entity_id_from_string,
+                'id': UUID,
                 'tag': tag,
                 'created_at': datetime_from_string
             }
@@ -207,7 +207,7 @@ async def test_patch_fortune(client, create_fortune):
     expected = {
         'id': f'{fortune_id}',
         'author': {
-            'id': entity_id_from_string,
+            'id': UUID,
             'name': payload['author'],
             'created_at': datetime_from_string
         },
@@ -216,7 +216,7 @@ async def test_patch_fortune(client, create_fortune):
         'updated_at': datetime_from_string,
         'tags': [
             {
-                'id': entity_id_from_string,
+                'id': UUID,
                 'tag': tag,
                 'created_at': datetime_from_string
             }
@@ -257,52 +257,6 @@ async def test_patch_fortune_removing_tags(client, create_fortune):
     ],
 )
 @pytest.mark.anyio
-async def test_patch_entity_fail_invalid_id_string_too_long(
-        client,
-        path,
-        payload,
-):
-    entity_id = value_too_long(EntityId)
-    response = await client.patch(f'{path}/{entity_id}', json=payload)
-    actual = response.json()
-    expected = {'detail': [{'type': 'string_too_long'}]}
-
-    assert response.status_code == 422
-    match(expected, actual, embedded=True)
-
-
-@pytest.mark.parametrize(
-    "path,payload",
-    [
-        ('/api/fortunes', random_fortune_payload()),
-        ('/api/authors', {'name': random_value(AuthorName)}),
-        ('/api/tags', {'tag': random_value(TagValue)}),
-    ],
-)
-@pytest.mark.anyio
-async def test_patch_entity_fail_invalid_id_string_too_short(
-        client,
-        path,
-        payload,
-):
-    entity_id = value_too_short(EntityId)
-    response = await client.patch(f'{path}/{entity_id}', json=payload)
-    actual = response.json()
-    expected = {'detail': [{'type': 'string_too_short'}]}
-
-    assert response.status_code == 422
-    match(expected, actual, embedded=True)
-
-
-@pytest.mark.parametrize(
-    "path,payload",
-    [
-        ('/api/fortunes', random_fortune_payload()),
-        ('/api/authors', {'name': random_value(AuthorName)}),
-        ('/api/tags', {'tag': random_value(TagValue)}),
-    ],
-)
-@pytest.mark.anyio
 async def test_patch_entity_fail_invalid_id_value_error(
         client,
         invalid_entity_id,
@@ -311,7 +265,7 @@ async def test_patch_entity_fail_invalid_id_value_error(
 ):
     response = await client.patch(f'{path}/{invalid_entity_id}', json=payload)
     actual = response.json()
-    expected = {'detail': [{'type': 'value_error'}]}
+    expected = {'detail': [{'type': 'uuid_parsing'}]}
 
     assert response.status_code == 422
     match(expected, actual, embedded=True)
@@ -392,36 +346,6 @@ async def test_get_fortune(client, create_fortune):
     ['/api/fortunes', '/api/authors', '/api/tags'],
 )
 @pytest.mark.anyio
-async def test_get_entity_fail_invalid_id_string_too_long(client, path):
-    entity_id = value_too_long(EntityId)
-    response = await client.get(f'{path}/{entity_id}')
-    actual = response.json()
-    expected = {'detail': [{'type': 'string_too_long'}]}
-
-    assert response.status_code == 422
-    match(expected, actual, embedded=True)
-
-
-@pytest.mark.parametrize(
-    "path",
-    ['/api/fortunes', '/api/authors', '/api/tags'],
-)
-@pytest.mark.anyio
-async def test_get_entity_fail_invalid_id_string_too_short(client, path):
-    entity_id = value_too_short(EntityId)
-    response = await client.get(f'{path}/{entity_id}')
-    actual = response.json()
-    expected = {'detail': [{'type': 'string_too_short'}]}
-
-    assert response.status_code == 422
-    match(expected, actual, embedded=True)
-
-
-@pytest.mark.parametrize(
-    "path",
-    ['/api/fortunes', '/api/authors', '/api/tags'],
-)
-@pytest.mark.anyio
 async def test_get_entity_fail_invalid_id_value_error(
         client,
         invalid_entity_id,
@@ -429,7 +353,7 @@ async def test_get_entity_fail_invalid_id_value_error(
 ):
     response = await client.get(f'{path}/{invalid_entity_id}')
     actual = response.json()
-    expected = {'detail': [{'type': 'value_error'}]}
+    expected = {'detail': [{'type': 'uuid_parsing'}]}
 
     assert response.status_code == 422
     match(expected, actual, embedded=True)

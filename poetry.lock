@@ -1466,18 +1466,6 @@ doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
 
 [[package]]
-name = "tsidpy"
-version = "1.1.5"
-description = "A Python library for generating Time-Sorted Unique Identifiers (TSID)"
-optional = false
-python-versions = ">=3.7"
-groups = ["main"]
-files = [
-    {file = "tsidpy-1.1.5-py3-none-any.whl", hash = "sha256:e7b951a03cbb57c238c7511bbad2c2f855ae943df46916efea26f85a9f93b3b4"},
-    {file = "tsidpy-1.1.5.tar.gz", hash = "sha256:1a97201fe5697e54ed48ec5e5474358edc6fa3379f26ac29d1ce22c0fc4c375b"},
-]
-
-[[package]]
 name = "typer"
 version = "0.20.0"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
@@ -1835,4 +1823,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "2e7884fe98d6fedbd525793217d7ba0d1c7c4703f9e6521a352e6758a9656252"
+content-hash = "08eaf758734c951b027bec2ffa16ca131ea04aa38a8b1b9b8be225e18126a8f8"

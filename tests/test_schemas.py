@@ -4,8 +4,6 @@ import pytest
 
 from lucky.schemas import (
     AuthorName,
-    EntityId,
-    EntityModelOut,
     FortuneContent,
     FortunePatch,
     TagValue,
@@ -19,17 +17,9 @@ def test_fortune_patch_raise_value_error_all_attributes_missing():
         FortunePatch()
 
 
-def test_entity_model_out_serialize_id():
-    created_at = datetime.now()
-    instance = EntityModelOut(id=1, created_at=created_at)
-    serialized = instance.serialize_id(1, None)
-
-    assert serialized
-
-
 @pytest.mark.parametrize(
     "type_alias",
-    [AuthorName, TagValue, FortuneContent, EntityId],
+    [AuthorName, TagValue, FortuneContent],
 )
 def test_min_length(type_alias):
     value = min_length(type_alias)
@@ -39,7 +29,7 @@ def test_min_length(type_alias):
 
 @pytest.mark.parametrize(
     "type_alias",
-    [AuthorName, TagValue, FortuneContent, EntityId],
+    [AuthorName, TagValue, FortuneContent],
 )
 def test_max_length(type_alias):
     value = max_length(type_alias)

@@ -1,14 +1,14 @@
 import re
-import sys
 from datetime import datetime
 from typing import Optional, Self
+from uuid import UUID, uuid7
 
 from sqlalchemy import (
     Column,
     DateTime,
     ForeignKey,
-    Integer,
     Table,
+    Uuid,
     func,
     select
 )
@@ -28,22 +28,6 @@ from sqlalchemy.orm import (
     relationship
 )
 from sqlalchemy.orm.attributes import flag_modified
-from tsidpy import TSID
-
-
-def entity_id() -> int:
-    return TSID.create().number
-
-
-def entity_id_from_string(s: str) -> int:
-    number = TSID.from_string(s).number
-    if number < 0 or number > sys.maxsize:
-        raise ValueError('invalid string')
-    return number
-
-
-def entity_id_to_string(id: int) -> str:
-    return TSID(id).to_string()
 
 
 def datetime_from_string(s: str) -> datetime:
@@ -121,14 +105,14 @@ FortuneTag = Table(
     Base.metadata,
     Column(
         'fortune_id',
-        Integer,
+        Uuid,
         ForeignKey('fortunes.id', ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     ),
     Column(
         'tag_id',
-        Integer,
+        Uuid,
         ForeignKey('tags.id', ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
@@ -139,7 +123,7 @@ FortuneTag = Table(
 class Author(WithFortunesMixin, Base):
     __tablename__ = 'authors'
 
-    id: Mapped[int] = mapped_column(primary_key=True, default=entity_id)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     name: Mapped[str] = mapped_column(unique=True)
     fortunes_relationship: WriteOnlyMapped['Fortune'] = relationship(
         back_populates='author',
@@ -152,7 +136,7 @@ class Author(WithFortunesMixin, Base):
 class Fortune(Base):
     __tablename__ = 'fortunes'
 
-    id: Mapped[int] = mapped_column(primary_key=True, default=entity_id)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     content: Mapped[str] = mapped_column(unique=True)
     author_id: Mapped[int] = mapped_column(
         ForeignKey('authors.id', ondelete="RESTRICT"),
@@ -177,7 +161,7 @@ class Fortune(Base):
 class Tag(WithFortunesMixin, Base):
     __tablename__ = 'tags'
 
-    id: Mapped[int] = mapped_column(primary_key=True, default=entity_id)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     tag: Mapped[str] = mapped_column(unique=True)
     fortunes_relationship: WriteOnlyMapped['Fortune'] = relationship(
         secondary=FortuneTag,
