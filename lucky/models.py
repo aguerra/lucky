@@ -15,11 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine
-)
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -171,7 +167,3 @@ class Tag(WithFortunesMixin, Base):
 
     def __repr__(self):
         return f'Tag(id={self.id}, tag="{self.tag}")'
-
-
-engine = create_async_engine('sqlite+aiosqlite:///db.sqlite3')
-async_session = async_sessionmaker(engine, expire_on_commit=False)

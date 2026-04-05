@@ -1,10 +1,15 @@
-from functools import wraps
+from functools import lru_cache, wraps
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine
+)
 
-from .models import EntityExistsError, async_session
+from .config import Settings
+from .models import EntityExistsError
 
 
 def catch_session_exceptions(func):
@@ -18,8 +23,18 @@ def catch_session_exceptions(func):
     return wrapper
 
 
+@lru_cache
+def get_settings():
+    return Settings()
+
+
 @catch_session_exceptions
-async def get_session() -> AsyncGenerator:
+async def get_session(
+        settings: Annotated[str, Depends(get_settings)],
+) -> AsyncGenerator:
+    db_url = settings.db_url
+    engine = create_async_engine(db_url)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         yield session
 
